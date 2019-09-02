@@ -7,12 +7,17 @@ app.set('view engine', 'ejs');
 //use res.render
 
 const urlDatabase = {
-  'b2xVn2': 'http://www.lighthouse .ca',
+  'b2xVn2': 'http://www.lighthouse.ca',
   '9sm5xK': 'http://www.google.com'
 };
 
 app.get('/', (req, res) => {
   res.send('Hello!');
+});
+
+app.get('/urls', (req, res) => {
+  let templateVars = {urls: urlDatabase};
+  res.render('urls_index', templateVars);
 });
 
 app.get("/urls.json", (req, res) => {
