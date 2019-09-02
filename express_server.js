@@ -23,20 +23,23 @@ app.get('/urls', (req, res) => {
 });
 
 app.post('/urls', (req, res) => {
-  console.log(req.body);
-  res.send('OK');
+  urlDatabase[generateRandomString()] = req.body.longURL;
+  let generatedStr = Object.keys(urlDatabase).find(key => urlDatabase[key] === req.body.longURL);
+  res.redirect(`/urls/${generatedStr}`);
 })
 
 app.get('/urls/new', (req, res) => {
   res.render('urls_new');
 });
 
-
-
 app.get('/urls/:shortURL', (req, res) => {
   let templateVars = { shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL] };
   res.render('urls_show', templateVars)
+});
 
+app.get('/u/:shortURL', (req, res) => {              
+  let longURL = urlDatabase[req.params.shortURL];
+  res.redirect(longURL);
 });
 
 app.listen(PORT, () => {
@@ -52,4 +55,3 @@ function generateRandomString() {
     }
     return randomString;
 }
-generateRandomString();
