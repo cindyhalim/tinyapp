@@ -2,8 +2,9 @@
   "name": "tinyapp",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "express_server.js",
   "scripts": {
+    "start": "./node_modules/.bin/nodemon -L express-server.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -19,7 +20,10 @@
   "homepage": "https://github.com/cindyhalim/tinyapp#readme",
   "dependencies": {
     "body-parser": "^1.19.0",
-    "ejs": "^2.6.2",
+    "ejs": "^2.7.1",
     "express": "^4.17.1"
+  },
+  "devDependencies": {
+    "nodemon": "^1.19.2"
   }
 }
