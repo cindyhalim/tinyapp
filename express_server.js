@@ -15,6 +15,7 @@ app.use(cookieParser());
 const bodyParser = require('body-parser');
 app.use(bodyParser.urlencoded({ extended: true }));
 
+const bcrypt = require('bcrypt');
 
 //DATABASE
 const urlDatabase = {
@@ -27,16 +28,16 @@ const urlDatabase = {
 };
 
 const users = { 
-  "userRandomID": {
-    id: "userRandomID", 
-    email: "user@example.com", 
-    password: "purple-monkey-dinosaur"
-  },
- "user2RandomID": {
-    id: "user2RandomID", 
-    email: "user2@example.com", 
-    password: "dishwasher-funk"
-  }
+//   "userRandomID": {
+//     id: "userRandomID", 
+//     email: "user@example.com", 
+//     password: "purple-monkey-dinosaur"
+//   },
+//  "user2RandomID": {
+//     id: "user2RandomID", 
+//     email: "user2@example.com", 
+//     password: "dishwasher-funk"
+//   }
 }
 
 //LOGIN/REG
@@ -48,9 +49,8 @@ app.get('/login', (req, res) => {
 
 app.post('/login', (req, res) => {
   let email = req.body.email
-  let password = req.body.password
-  if (emailExists(email, users) && passwordMatches(email, password, users)) {
-    res.cookie('user_id', findUserId(email, password, users))
+  if (emailExists(email, users) && bcrypt.compareSync(req.body.password, users[findUserId(email, users)].password)) {
+    res.cookie('user_id', findUserId(email, users))
     res.redirect('/urls');
   } else {
     res.statusCode = 403;
@@ -74,11 +74,14 @@ app.post('/register', (req, res) => {
     res.statusCode = 400;
     res.send(`Error ${res.statusCode}`);
   } else {
-    users[userID] = {id: userID, email: req.body.email, password: req.body.password}
+    users[userID] = {id: userID, email: req.body.email, password: bcrypt.hashSync(req.body.password, 10)}
     res.cookie('user_id', users[userID].id);
     res.redirect('/urls');
   }
 })
+
+//storing encrypted passwords
+//and then matching it after???
 
 //OTHER REQUESTS
 app.get('/urls', (req, res) => {
@@ -168,18 +171,9 @@ const emailExists = (email, data) => {
   return false;
 }
 
-const passwordMatches = (email, password, data) => {
+const findUserId = (email, data) => {
   for (let obj in data) {
-    if (email === users[obj].email && password === users[obj].password) {
-      return true;
-    }
-  }
-  return false;
-}
-
-const findUserId = (email, password, data) => {
-  for (let obj in data) {
-    if (email === users[obj].email && password === users[obj].password) {
+    if (email === users[obj].email) {
       return users[obj]['id'];
     }
   }
@@ -190,7 +184,7 @@ const urlsForUser = (id) => {
   let userSpecificData = {};
   for (let url in urlDatabase) {
     if (urlDatabase[url].userID === id) {
-      userSpecificData[url] = urlDatabase[url];
+      userSpecificData[url] = urlDatabase[url].longURL;
     } 
   }
   return userSpecificData;
