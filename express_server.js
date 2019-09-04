@@ -52,8 +52,11 @@ app.post('/urls', (req, res) => {
 })
 
 app.get('/urls/new', (req, res) => {
-  let templateVars = { user: users[req.cookies['user_id']]};
-  res.render('urls_new', templateVars);
+  if (req.cookies['user_id']) {
+    let templateVars = { user: users[req.cookies['user_id']]};
+    res.render('urls_new', templateVars);
+  }
+  res.redirect('/login');
 });
 
 app.post('/urls/:shortURL/delete', (req, res) => {
@@ -92,8 +95,6 @@ app.post('/login', (req, res) => {
     res.statusCode = 403;
     res.send(`Error ${res.statusCode}`);
   }
-  
-
 })
 
 app.post('/logout', (req, res) => {
