@@ -77,9 +77,23 @@ app.get('/u/:shortURL', (req, res) => {
   res.redirect(longURL);
 });
 
+app.get('/login', (req, res) => {
+  let templateVars = {user: users[req.cookies['user_id']]};
+  res.render('urls_login', templateVars);
+})
+
 app.post('/login', (req, res) => {
-  res.cookie('user_id', req.body.user_id)
-  res.redirect('/urls');
+  let email = req.body.email
+  let password = req.body.password
+  if (emailExists(email, users) && passwordMatches(email, password, users)) {
+    res.cookie('user_id', findUserId(email, password, users))
+    res.redirect('/urls');
+  } else {
+    res.statusCode = 403;
+    res.send(`Error ${res.statusCode}`);
+  }
+  
+
 })
 
 app.post('/logout', (req, res) => {
@@ -103,6 +117,8 @@ app.post('/register', (req, res) => {
     res.redirect('/urls');
   }
 })
+
+
 
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}`)
@@ -135,4 +151,21 @@ const emailExists = (email, data) => {
     }
   }
   return false;
+}
+
+const passwordMatches = (email, password, data) => {
+  for (let obj in data) {
+    if (email === users[obj].email && password === users[obj].password) {
+      return true;
+    }
+  }
+  return false;
+}
+
+const findUserId = (email, password, data) => {
+  for (let obj in data) {
+    if (email === users[obj].email && password === users[obj].password) {
+      return users[obj]['id'];
+    }
+  }
 }

@@ -20,10 +20,14 @@
         </button>
       </form>
       <% } else { %>
-      <form method="POST" action="/login">
-        <input class="form-control form-check-inline" type="text" name="user" style="width: 200px; margin: 0.5em">
+      <form method="GET" action="/login">
         <button type="submit" class="btn btn-primary form-check form-check-inline">
           Login
+        </button>
+      </form>
+      <form method="GET" action="/register">
+        <button type="submit" class="btn btn-primary form-check form-check-inline">
+          Register
         </button>
       </form>
       <% } %>
