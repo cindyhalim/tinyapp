@@ -93,7 +93,6 @@ app.get('/urls', (req, res) => {
 
 app.post('/urls', (req, res) => {
   urlDatabase[generateRandomString()] = {longURL: req.body.longURL, userID: users[req.cookies['user_id']].id};
-  console.log(urlDatabase);
   let generatedStr = Object.keys(urlDatabase).find(key => urlDatabase[key].longURL === req.body.longURL);
   res.redirect(`/urls/${generatedStr}`);
 })
@@ -102,13 +101,18 @@ app.get('/urls/new', (req, res) => {
   if (req.cookies['user_id']) {
     let templateVars = { user: users[req.cookies['user_id']]};
     res.render('urls_new', templateVars);
+  } else {
+    res.redirect('/login');
   }
-  res.redirect('/login');
 });
 
 app.post('/urls/:shortURL/delete', (req, res) => {
-  delete urlDatabase[req.params.shortURL];
-  res.redirect('/urls');
+  if (req.cookies['user_id'] === urlDatabase[req.params.shortURL].userID) {
+    delete urlDatabase[req.params.shortURL];
+    res.redirect('/urls');
+  } else {
+    res.send(`Error: Cannot remove someone else's URL`);
+  }
 });
 
 app.get('/urls/:shortURL', (req, res) => {
@@ -118,8 +122,12 @@ app.get('/urls/:shortURL', (req, res) => {
 
 
 app.post('/urls/:shortURL', (req, res) => {
-  urlDatabase[req.params.shortURL].longURL = req.body.longURL;
-  res.redirect('/urls');
+  if (req.cookies['user_id'] === urlDatabase[req.params.shortURL].userID) {
+    urlDatabase[req.params.shortURL].longURL = req.body.longURL;
+    res.redirect('/urls');
+  } else {
+    res.send(`Error: Cannot edit someone else's URL`);
+  }
 });
 
 app.get('/u/:shortURL', (req, res) => {              
