@@ -11,23 +11,27 @@ app.set('view engine', 'ejs');
 const cookieSession = require('cookie-session');
 app.use(cookieSession({
   name: 'session',
-  keys: ['user_id']
+  keys: ['user_id'],
+  maxAge: 60 * 60 * 1000
 }));
-
 
 const bodyParser = require('body-parser');
 app.use(bodyParser.urlencoded({ extended: true }));
 
 const bcrypt = require('bcrypt');
 
+//MODULES
+
+const { findUserId, generateRandomString, generateRandomId, emailExists, urlsForUser } = require('./helpers.js');
+
 //DATABASE
 const urlDatabase = {
-  'b2xVn2': {
-    longURL:'http://www.lighthouse.ca', 
-    userID: 'userRandomID'},
-  '9sm5xK': {
-    longURL: 'http://www.google.com',
-    userID: 'user2RandomID'}
+  // 'b2xVn2': {
+  //   longURL:'http://www.lighthouse.ca', 
+  //   userID: 'userRandomID'},
+  // '9sm5xK': {
+  //   longURL: 'http://www.google.com',
+  //   userID: 'user2RandomID'}
 };
 
 const users = { 
@@ -62,8 +66,7 @@ app.post('/login', (req, res) => {
 })
 
 app.post('/logout', (req, res) => {
-  req.session = null; 
-  // ('user_id', req.body.user_id)
+  req.session = null;
   res.redirect('/urls');
 })
 
@@ -84,14 +87,11 @@ app.post('/register', (req, res) => {
   }
 })
 
-//storing encrypted passwords
-//and then matching it after???
-
 //OTHER REQUESTS
 app.get('/urls', (req, res) => {
   let userCookie = req.session.user_id;
   if (userCookie) {
-    let templateVars = { user: users[userCookie], urls: urlsForUser(userCookie)};
+    let templateVars = { user: users[userCookie], urls: urlsForUser(userCookie, urlDatabase, users)};
     res.render('urls_index', templateVars);
   } else {
     res.redirect('/login');
@@ -145,51 +145,3 @@ app.get('/u/:shortURL', (req, res) => {
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}`)
 });
-
-const generateRandomString = () => {
-    let randomString = '';
-    let numbers = '1234567890'
-    let characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
-    for (let i = 0; i < 3; i++) {
-      randomString += characters.charAt(Math.floor(Math.random() * characters.length)) + numbers.charAt(Math.floor(Math.random() * numbers.length));
-    }
-    return randomString;
-}
-
-const generateRandomId = (email) => {
-  let randomId = '';
-  let numbers = '1234567890'
-  randomId = email.split('@')[0]
-  for (let i = 0; i < 3; i++) {
-    randomId += i;
-  }
-  return randomId;
-}
-
-const emailExists = (email, data) => {
-  for (let obj in data) {
-    if (email === users[obj].email) {
-      return true;
-    }
-  }
-  return false;
-}
-
-const findUserId = (email, data) => {
-  for (let obj in data) {
-    if (email === users[obj].email) {
-      return users[obj]['id'];
-    }
-  }
-}
-
-//function returns an object with only the user specific short url
-const urlsForUser = (id) => {
-  let userSpecificData = {};
-  for (let url in urlDatabase) {
-    if (urlDatabase[url].userID === id) {
-      userSpecificData[url] = urlDatabase[url].longURL;
-    } 
-  }
-  return userSpecificData;
-}
