@@ -29,6 +29,7 @@ const urlDatabase = {};
 
 const users = {};
 
+const visitorsList = [];
 //LOGIN/REG
 
 app.get('/login', (req, res) => {
@@ -72,7 +73,6 @@ app.post('/logout', (req, res) => {
   res.redirect('/urls');
 });
 
-
 //GET
 
 app.get('/', (req, res) => {
@@ -85,7 +85,7 @@ app.get('/', (req, res) => {
 
 app.get('/urls', (req, res) => {
   if (users[req.session.user_id]) {
-    let templateVars = { user: users[req.session.user_id], urls: urlsForUser(req.session.user_id, urlDatabase, users)};
+    let templateVars = { user: users[req.session.user_id], urls: urlsForUser(req.session.user_id, urlDatabase, users) };
     res.render('urls_index', templateVars);
   } else {
     res.redirect('/login');
@@ -104,7 +104,14 @@ app.get('/urls/new', (req, res) => {
 app.get('/urls/:shortURL', (req, res) => {
   if (users[req.session.user_id]) {
     if (users[req.session.user_id].id === urlDatabase[req.params.shortURL].userID) {
-      let templateVars = { user: users[req.session.user_id], shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL].longURL };
+      let templateVars = {
+        user: users[req.session.user_id],
+        shortURL: req.params.shortURL,
+        longURL: urlDatabase[req.params.shortURL].longURL,
+        visitCount: urlDatabase[req.params.shortURL].visitCount,
+        uniqueCount: urlDatabase[req.params.shortURL].uniqueVisits,
+        timeStamp: urlDatabase[req.params.shortURL].timeStamp
+      };
       res.render('urls_show', templateVars);
     } else {
       res.send('Access denied: this URL belongs to another user');
@@ -117,6 +124,12 @@ app.get('/urls/:shortURL', (req, res) => {
 app.get('/u/:shortURL', (req, res) => {
   if (urlDatabase[req.params.shortURL]) {
     let longURL = urlDatabase[req.params.shortURL].longURL;
+    urlDatabase[req.params.shortURL].visitCount++;
+    urlDatabase[req.params.shortURL].timeStamp = new Date();
+    if (!visitorsList.includes(users[req.session.user_id].id)) {
+      visitorsList.push(urlDatabase[req.params.shortURL].userID);
+      urlDatabase[req.params.shortURL].uniqueVisits++;
+    }
     res.redirect(longURL);
   } else {
     res.send('This URL does not exist');
@@ -126,7 +139,13 @@ app.get('/u/:shortURL', (req, res) => {
 //POST
 
 app.post('/urls', (req, res) => {
-  urlDatabase[generateRandomString()] = { longURL: req.body.longURL, userID: users[req.session.user_id].id };
+  urlDatabase[generateRandomString()] = {
+    longURL: req.body.longURL,
+    userID: users[req.session.user_id].id,
+    visitCount: 0,
+    uniqueVisits: 0,
+    timeStamp: ''
+   };
   let generatedStr = Object.keys(urlDatabase).find(key => urlDatabase[key].longURL === req.body.longURL);
   res.redirect(`/urls/${generatedStr}`);
 });
