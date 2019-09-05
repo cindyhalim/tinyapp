@@ -17,6 +17,9 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 const bcrypt = require('bcrypt');
 
+const methodOverride = require('method-override');
+app.use(methodOverride('_method'));
+
 //MODULES
 
 const { findUserId, generateRandomString, emailExists, urlsForUser } = require('./helpers.js');
@@ -128,7 +131,7 @@ app.post('/urls', (req, res) => {
   res.redirect(`/urls/${generatedStr}`);
 });
 
-app.post('/urls/:shortURL/delete', (req, res) => {
+app.delete('/urls/:shortURL', (req, res) => {
   if (req.session.user_id === urlDatabase[req.params.shortURL].userID) {
     delete urlDatabase[req.params.shortURL];
     res.redirect('/urls');
@@ -137,7 +140,7 @@ app.post('/urls/:shortURL/delete', (req, res) => {
   }
 });
 
-app.post('/urls/:shortURL', (req, res) => {
+app.put('/urls/:shortURL', (req, res) => {
   if (req.session.user_id === urlDatabase[req.params.shortURL].userID) {
     urlDatabase[req.params.shortURL].longURL = req.body.longURL;
     res.redirect('/urls');
