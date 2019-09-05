@@ -1,3 +1,4 @@
+//HELPER FUNCTIONS
 
 const findUserId = (email, data) => {
   for (let obj in data) {
@@ -6,28 +7,17 @@ const findUserId = (email, data) => {
     }
   }
   return undefined;
-}
+};
 
 const generateRandomString = () => {
   let randomString = '';
-  let numbers = '1234567890'
+  let numbers = '1234567890';
   let characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
   for (let i = 0; i < 3; i++) {
     randomString += characters.charAt(Math.floor(Math.random() * characters.length)) + numbers.charAt(Math.floor(Math.random() * numbers.length));
   }
   return randomString;
-}
-
-//TODO: do we need?
-const generateRandomId = (email) => {
-  let randomId = '';
-  let numbers = '1234567890'
-  randomId = email.split('@')[0]
-  for (let i = 0; i < 3; i++) {
-    randomId += i;
-  }
-  return randomId;
-}
+};
 
 const emailExists = (email, data) => {
   for (let obj in data) {
@@ -36,7 +26,7 @@ const emailExists = (email, data) => {
     }
   }
   return false;
-}
+};
 
 const urlsForUser = (id, data) => {
   let userSpecificData = {};
@@ -46,6 +36,6 @@ const urlsForUser = (id, data) => {
     }
   }
   return userSpecificData;
-}
+};
 
-module.exports = { findUserId, generateRandomString, generateRandomId, emailExists, urlsForUser };
+module.exports = { findUserId, generateRandomString, emailExists, urlsForUser };
