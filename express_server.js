@@ -29,7 +29,8 @@ const urlDatabase = {};
 
 const users = {};
 
-const visitorsList = [];
+const visitorList = {};
+
 //LOGIN/REG
 
 app.get('/login', (req, res) => {
@@ -109,8 +110,9 @@ app.get('/urls/:shortURL', (req, res) => {
         shortURL: req.params.shortURL,
         longURL: urlDatabase[req.params.shortURL].longURL,
         visitCount: urlDatabase[req.params.shortURL].visitCount,
-        uniqueCount: urlDatabase[req.params.shortURL].uniqueVisits,
-        timeStamp: urlDatabase[req.params.shortURL].timeStamp
+        uniqueCount: visitorList[req.params.shortURL].length,
+        timeStamp: urlDatabase[req.params.shortURL].timeStamp,
+        visitorID: urlDatabase[req.params.shortURL].visitorID
       };
       res.render('urls_show', templateVars);
     } else {
@@ -124,11 +126,20 @@ app.get('/urls/:shortURL', (req, res) => {
 app.get('/u/:shortURL', (req, res) => {
   if (urlDatabase[req.params.shortURL]) {
     let longURL = urlDatabase[req.params.shortURL].longURL;
+    //STRETCH
+
     urlDatabase[req.params.shortURL].visitCount++;
-    urlDatabase[req.params.shortURL].timeStamp = new Date();
-    if (!visitorsList.includes(users[req.session.user_id].id)) {
-      visitorsList.push(urlDatabase[req.params.shortURL].userID);
-      urlDatabase[req.params.shortURL].uniqueVisits++;
+    urlDatabase[req.params.shortURL].timeStamp.push(new Date());
+    urlDatabase[req.params.shortURL].visitorID.push(generateRandomString());
+
+    //unique counts
+    if (users[req.session.user_id] && !visitorList[req.params.shortURL].includes(req.session.user_id)) {
+      visitorList[req.params.shortURL].push(urlDatabase[req.params.shortURL].userID);
+    } else if (!users[req.session.user_id]) { //for cases in which visitor is not a user
+      if (! visitorList[req.params.shortURL].includes(req.session.user_id)) {
+        req.session.user_id = generateRandomString();
+        visitorList[req.params.shortURL].push(req.session.user_id);
+      }
     }
     res.redirect(longURL);
   } else {
@@ -139,13 +150,18 @@ app.get('/u/:shortURL', (req, res) => {
 //POST
 
 app.post('/urls', (req, res) => {
-  urlDatabase[generateRandomString()] = {
+  let shortURL = generateRandomString();
+  urlDatabase[shortURL] = {
     longURL: req.body.longURL,
     userID: users[req.session.user_id].id,
     visitCount: 0,
     uniqueVisits: 0,
-    timeStamp: ''
-   };
+    timeStamp: [],
+    visitorID: []
+  };
+
+  visitorList[shortURL] = [];
+
   let generatedStr = Object.keys(urlDatabase).find(key => urlDatabase[key].longURL === req.body.longURL);
   res.redirect(`/urls/${generatedStr}`);
 });

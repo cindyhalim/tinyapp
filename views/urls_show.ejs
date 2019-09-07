@@ -17,15 +17,34 @@
     <div class="card-body">
       <h5 class="card-title">TinyURL for: <%= longURL %></h5>
       <p class="card-text">Short URL: <a href="/u/<%= shortURL %>"><%= shortURL %></a></p>
-      <p style="font-weight: bold; font-size: 12px">Total visits: <%= visitCount %></p>
-      <p style="font-weight: bold; font-size: 12px">Unique visits: <%= uniqueCount %></p>
-      <p style="font-weight: bold; font-size: 12px">Timestamp: <%= timeStamp %></p>
     </div>
     <div class="card-footer text-muted">
       <h2 class="card-title">Edit</h2>
       <form method="POST" action="/urls/<%= shortURL%>?_method=PUT">
-        <label for="longURL">Enter a URL: <input class="form-control form-check-inline" type="text" name="longURL" placeholder="http://" value="http://" style="width: 300px; margin: 1em"><button type="submit" class="btn btn-primary form-check form-check-inline">Submit</button></label>
+        <label for="longURL">Enter a URL: <input class="form-control form-check-inline" type="text" name="longURL"
+            placeholder="http://" value="http://" style="width: 300px; margin: 1em"><button type="submit"
+            class="btn btn-primary form-check form-check-inline">Submit</button></label>
       </form>
+      <p style="font-weight: bold; font-size: 12px">Total visits: <%= visitCount %></p>
+      <p style="font-weight: bold; font-size: 12px">Unique visits: <%= uniqueCount %></p>
+      <button class="btn btn-primary form-check" style="margin-bottom: 2em" id="toggleButton">Click to view visitor
+        information</button>
+      <table class="table table-hover" id= "toggleTable">
+        <thead>
+          <tr>
+            <th scope="col">Visitor ID</th>
+            <th scope="col">Time Stamp</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% for(let item in timeStamp) { %>
+          <tr>
+            <td><%= visitorID[item] %></td>
+            <td><%= timeStamp[item] %></td>
+          </tr>
+          <% } %>
+        </tbody>
+      </table>
     </div>
   </div>
   <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
@@ -37,6 +56,14 @@
   <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
     integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
     crossorigin="anonymous"></script>
+  <script>
+    $(document).ready(function () {
+      $("#toggleTable").hide();
+      $("#toggleButton").click(function () {
+        $("#toggleTable").toggle();
+      });
+    });
+  </script>
 </body>
 
 </html>
