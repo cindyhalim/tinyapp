@@ -1,8 +1,15 @@
 <header>
-  <nav class="navbar navbar-expand-md navbar-dark bg-success">
+  <nav class="navbar navbar-expand-md navbar-dark bg-dark">
     <a href="/urls" class="navbar-brand">TinyApp</a>
-    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup"
-      aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+    <button
+      class="navbar-toggler"
+      type="button"
+      data-toggle="collapse"
+      data-target="#navbarNavAltMarkup"
+      aria-controls="navbarNavAltMarkup"
+      aria-expanded="false"
+      aria-label="Toggle navigation"
+    >
       <span class="navbar-toggler-icon"></span>
     </button>
     <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
@@ -14,19 +21,29 @@
     <div class="d-flex justify-content-end align-items-center">
       <% if (user) { %>
       <form method="POST" action="/logout">
-        <p class="d-inline">Logged in as: <%= user.email%> </p>
-        <button type="submit" class="btn btn-primary form-check form-check-inline" style="margin-left: 0.5em">
+        <p class="d-inline">Logged in as: <%= user.email%></p>
+        <button
+          type="submit"
+          class="btn btn-primary form-check form-check-inline"
+          style="margin-left: 0.5em"
+        >
           Logout
         </button>
       </form>
       <% } else { %>
       <form method="GET" action="/login">
-        <button type="submit" class="btn btn-primary form-check form-check-inline">
+        <button
+          type="submit"
+          class="btn btn-primary form-check form-check-inline"
+        >
           Login
         </button>
       </form>
       <form method="GET" action="/register">
-        <button type="submit" class="btn btn-primary form-check form-check-inline">
+        <button
+          type="submit"
+          class="btn btn-primary form-check form-check-inline"
+        >
           Register
         </button>
       </form>

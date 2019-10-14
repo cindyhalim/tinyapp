@@ -3,18 +3,20 @@
 const findUserId = (email, data) => {
   for (let obj in data) {
     if (email === data[obj].email) {
-      return data[obj]['id'];
+      return data[obj]["id"];
     }
   }
   return undefined;
 };
 
 const generateRandomString = () => {
-  let randomString = '';
-  let numbers = '1234567890';
-  let characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
+  let randomString = "";
+  let numbers = "1234567890";
+  let characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
   for (let i = 0; i < 3; i++) {
-    randomString += characters.charAt(Math.floor(Math.random() * characters.length)) + numbers.charAt(Math.floor(Math.random() * numbers.length));
+    randomString +=
+      characters.charAt(Math.floor(Math.random() * characters.length)) +
+      numbers.charAt(Math.floor(Math.random() * numbers.length));
   }
   return randomString;
 };

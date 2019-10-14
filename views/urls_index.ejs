@@ -10,6 +10,7 @@
       integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS"
       crossorigin="anonymous"
     />
+    <link rel="stylesheet" href="../styles/header.css" />
     <title>TinyApp</title>
   </head>
 
@@ -29,7 +30,11 @@
         <tbody>
           <% for (let url of urls) { %>
           <tr>
-            <td><%= url.short_url %></td>
+            <td>
+              <a href="/u/<%= url.short_url%>" target="_blank"
+                ><%= url.short_url %></a
+              >
+            </td>
             <td><%= url.long_url %></td>
             <td>
               <form method="GET" action="/urls/<%= url.short_url %>">
