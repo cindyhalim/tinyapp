@@ -1,0 +1,25 @@
+body {
+  padding: 0;
+  margin: 0;
+  font-family: "Roboto", sans-serif;
+  width: 100%;
+}
+
+.main-container {
+  background-image: url("assets/login-bg.png");
+  background-size: contain;
+  height: 800px;
+  width: 100%;
+  background-repeat: no-repeat;
+}
+
+.login-card label {
+  width: 400px;
+  margin: 2em 0em;
+}
+
+.card-title {
+  text-align: center;
+  padding: 0.5em;
+  color: white;
+}

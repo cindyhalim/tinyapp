@@ -1,6 +1,6 @@
 <header>
-  <nav class="navbar navbar-expand-md navbar-dark bg-dark">
-    <a href="/urls" class="navbar-brand">TinyApp</a>
+  <nav>
+    <a href="/urls" class="navbar-brand">tinyApp</a>
     <button
       class="navbar-toggler"
       type="button"
@@ -10,44 +10,48 @@
       aria-expanded="false"
       aria-label="Toggle navigation"
     >
-      <span class="navbar-toggler-icon"></span>
+      <span class="navbar-toggler-icon">
+        <i class="fas fa-sort-down"></i>
+      </span>
     </button>
-    <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
-      <div class="navbar-nav">
-        <a class="nav-item nav-link" href="/urls">My URLs</a>
-        <a class="nav-item nav-link" href="/urls/new">Create New URL</a>
+    <div class="login-container">
+      <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+        <div class="navbar-nav">
+          <a class="nav-item nav-link" href="/urls">My URLs</a>
+          <a class="nav-item nav-link" href="/urls/new">Create New URL</a>
+        </div>
       </div>
-    </div>
-    <div class="d-flex justify-content-end align-items-center">
-      <% if (user) { %>
-      <form method="POST" action="/logout">
-        <p class="d-inline">Logged in as: <%= user.email%></p>
-        <button
-          type="submit"
-          class="btn btn-primary form-check form-check-inline"
-          style="margin-left: 0.5em"
-        >
-          Logout
-        </button>
-      </form>
-      <% } else { %>
-      <form method="GET" action="/login">
-        <button
-          type="submit"
-          class="btn btn-primary form-check form-check-inline"
-        >
-          Login
-        </button>
-      </form>
-      <form method="GET" action="/register">
-        <button
-          type="submit"
-          class="btn btn-primary form-check form-check-inline"
-        >
-          Register
-        </button>
-      </form>
-      <% } %>
+      <div class="d-flex justify-content-end align-items-center">
+        <% if (user) { %>
+        <form method="POST" action="/logout">
+          <p class="d-inline">Logged in as: <%= user.email%></p>
+          <button
+            type="submit"
+            class="btn btn-primary form-check form-check-inline"
+            style="margin-left: 0.5em"
+          >
+            Logout
+          </button>
+        </form>
+        <% } else { %>
+        <form method="GET" action="/login">
+          <button
+            type="submit"
+            class="btn btn-primary form-check form-check-inline"
+          >
+            Login
+          </button>
+        </form>
+        <form method="GET" action="/register">
+          <button
+            type="submit"
+            class="btn btn-primary form-check form-check-inline"
+          >
+            Register
+          </button>
+        </form>
+        <% } %>
+      </div>
     </div>
   </nav>
 </header>
