@@ -55,7 +55,7 @@ const doesShortURLExist = function(shortURL) {
 const addNewURL = function(userID, longURL, shortURL) {
   let queryString = `INSERT INTO urls (user_id, long_url, short_url) VALUES ($1, $2, $3)`;
   let values = [userID, longURL, shortURL];
-  db.query(queryString, values).then(data => data.rows[0]);
+  return db.query(queryString, values).then(data => data.rows[0]);
 };
 
 const deleteURL = function(userID, shortURL) {

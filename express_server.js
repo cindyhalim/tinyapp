@@ -1,9 +1,8 @@
 const express = require("express");
-const apiRoutes = require("./server/apiRoutes");
-const userRoutes = require("./server/userRoutes");
 const cookieSession = require("cookie-session");
 const bodyParser = require("body-parser");
 const bcrypt = require("bcrypt");
+const methodOverride = require("method-override");
 const {
   getUserByEmail,
   addNewUser,
@@ -32,6 +31,7 @@ app.use(
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static(__dirname + "/public"));
+app.use(methodOverride("_method"));
 
 // USER
 app.get("/login", async (req, res) => {
@@ -157,24 +157,7 @@ app.post("/urls", async (req, res) => {
   res.redirect(`/urls/${newShortURL}`);
 });
 
-app.post("/urls/:shortURL/delete", async (req, res) => {
-  const userInfo = await getUserById(req.session.user_id);
-  if (req.session.user_id === userInfo.id) {
-    await deleteURL(req.session.user_id, req.params.shortURL);
-  } else {
-    res.send(`Error: Cannot remove someone else's URL`);
-  }
-});
-// app.post("/urls/:shortURL/delete", (req, res) => {
-//   if (req.session.user_id === urlDatabase[req.params.shortURL].userID) {
-//     delete urlDatabase[req.params.shortURL];
-//     res.redirect("/urls");
-//   } else {
-//     res.send(`Error: Cannot remove someone else's URL`);
-//   }
-// });
-
-app.post("/urls/:shortURL", async (req, res) => {
+app.put("/urls/:shortURL", async (req, res) => {
   const userInfo = await getUserById(req.session.user_id);
   if (req.session.user_id === userInfo.id) {
     await editExistingURL(
@@ -187,6 +170,24 @@ app.post("/urls/:shortURL", async (req, res) => {
     res.send(`Error: Cannot edit someone else's URL`);
   }
 });
+
+app.delete("/urls/:shortURL", async (req, res) => {
+  const userInfo = await getUserById(req.session.user_id);
+  if (req.session.user_id === userInfo.id) {
+    deleteURL(req.session.user_id, req.params.shortURL);
+    res.redirect("/urls");
+  } else {
+    res.send(`Error: Cannot remove someone else's URL`);
+  }
+});
+// app.post("/urls/:shortURL/delete", (req, res) => {
+//   if (req.session.user_id === urlDatabase[req.params.shortURL].userID) {
+//     delete urlDatabase[req.params.shortURL];
+//     res.redirect("/urls");
+//   } else {
+//     res.send(`Error: Cannot remove someone else's URL`);
+//   }
+// });
 
 app.listen(PORT, () => {
   console.log(`Listening on port ${PORT}`);
