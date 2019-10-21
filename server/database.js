@@ -73,10 +73,10 @@ const editExistingURL = function(userID, shortURL, newLongURL) {
 const getURLId = function(shortURL) {
   let queryString = `SELECT * FROM urls WHERE short_url = $1`;
   let values = [shortURL];
-  return db.query(queryString, values);
+  return db.query(queryString, values).then(data => data.rows[0].id);
 };
 const addVisitor = function(urlID, visitorID) {
-  let queryString = `INSERT INTO visits (url_id, visitor_id) VALUES $1, $2`;
+  let queryString = `INSERT INTO visits (url_id, visitor_id) VALUES ($1, $2);`;
   let values = [urlID, visitorID];
   return db.query(queryString, values);
 };
@@ -86,11 +86,26 @@ const totalVisits = function(shortURL) {
   JOIN urls ON url_id = urls.id 
   WHERE short_url = $1;`;
   let values = [shortURL];
+  return db.query(queryString, values).then(data => data.rows[0].count);
+};
+
+const getVisitorInfo = function(shortURL) {
+  let queryString = `SELECT * FROM visits JOIN urls ON url_id = urls.id 
+  WHERE short_url = $1 AND visitor_id != 'user';`;
+  let values = [shortURL];
   return db.query(queryString, values);
 };
 
 const uniqueVisits = function(shortURL) {
-  let queryString = `SELECT COUNT(*) FROM visits WHERE `;
+  let queryString = `SELECT COUNT (DISTINCT visitor_id) FROM visits JOIN urls ON urls.id = url_id WHERE short_url = $1`;
+  let values = [shortURL];
+  return db.query(queryString, values).then(data => data.rows[0].count);
+};
+
+const resetVisitorInfo = function(shortURLId) {
+  let queryString = `DELETE FROM visits WHERE url_id = $1`;
+  let values = [shortURLId];
+  return db.query(queryString, values);
 };
 
 module.exports = {
@@ -102,5 +117,11 @@ module.exports = {
   doesShortURLExist,
   addNewURL,
   deleteURL,
-  editExistingURL
+  editExistingURL,
+  getURLId,
+  addVisitor,
+  totalVisits,
+  getVisitorInfo,
+  uniqueVisits,
+  resetVisitorInfo
 };

@@ -15,7 +15,10 @@ const {
   editExistingURL,
   getURLId,
   addVisitor,
-  totalVisits
+  totalVisits,
+  getVisitorInfo,
+  uniqueVisits,
+  resetVisitorInfo
 } = require("./server/database");
 const { generateRandomString } = require("./helpers");
 
@@ -125,27 +128,6 @@ app.get("/urls/new", async (req, res) => {
   }
 });
 
-// app.get("/urls/:shortURL", (req, res) => {
-//   if (users[req.session.user_id]) {
-//     if (
-//       users[req.session.user_id].id === urlDatabase[req.params.shortURL].userID
-//     ) {
-//       let templateVars = {
-//         user: users[req.session.user_id],
-//         shortURL: req.params.shortURL,
-//         longURL: urlDatabase[req.params.shortURL].longURL,
-//         visitCount: urlDatabase[req.params.shortURL].visitCount,
-//         uniqueCount: visitorList[req.params.shortURL].length,
-//         timeStamp: urlDatabase[req.params.shortURL].timeStamp,
-//         visitorID: urlDatabase[req.params.shortURL].visitorID
-//       };
-//       res.render("urls_show", templateVars);
-//     } else {
-//       res.send("Access denied: this URL belongs to another user");
-//     }
-//   }
-// });
-
 app.get("/urls/:shortURL", async (req, res) => {
   if (req.session.user_id) {
     let shortURL = req.params.shortURL;
@@ -154,7 +136,9 @@ app.get("/urls/:shortURL", async (req, res) => {
       user: await getUserById(userID),
       shortURL,
       longURL: await getLongUrl(shortURL),
-      visitCount: await totalVisits(shortURL)
+      visitCount: await totalVisits(shortURL),
+      uniqueCount: await uniqueVisits(shortURL),
+      visitorInfo: await getVisitorInfo(shortURL).then(data => data.rows)
     };
     res.render("urls_show", templateVars);
   } else {
@@ -163,39 +147,12 @@ app.get("/urls/:shortURL", async (req, res) => {
   }
 });
 
-// app.get("/u/:shortURL", (req, res) => {
-//   if (urlDatabase[req.params.shortURL]) {
-//     let longURL = urlDatabase[req.params.shortURL].longURL;
-//     //STRETCH
-
-//     urlDatabase[req.params.shortURL].visitCount++;
-//     urlDatabase[req.params.shortURL].timeStamp.push(new Date());
-//     urlDatabase[req.params.shortURL].visitorID.push(generateRandomString());
-
-//     //unique counts
-//     if (
-//       users[req.session.user_id] &&
-//       !visitorList[req.params.shortURL].includes(req.session.user_id)
-//     ) {
-//       visitorList[req.params.shortURL].push(
-//         urlDatabase[req.params.shortURL].userID
-//       );
-//     } else if (!users[req.session.user_id]) {
-//       //for cases in which visitor is not a user
-//       if (!visitorList[req.params.shortURL].includes(req.session.user_id)) {
-//         req.session.user_id = generateRandomString();
-//         visitorList[req.params.shortURL].push(req.session.user_id);
-//       }
-//     }
-//   }
-// });
-
 app.get("/u/:shortURL", async (req, res) => {
   if (await doesShortURLExist(req.params.shortURL)) {
     const longURL = await getLongUrl(req.params.shortURL);
     if (req.session.user_id) {
-      urlID = await getURLid(req.params.shortURL);
-      await addVisitor(urlID, null);
+      urlID = await getURLId(req.params.shortURL);
+      await addVisitor(urlID, "user");
     } else {
       req.session.visitor_id = generateRandomString();
       urlID = await getURLId(req.params.shortURL);
@@ -208,25 +165,6 @@ app.get("/u/:shortURL", async (req, res) => {
 });
 
 //POST
-
-// app.post("/urls", (req, res) => {
-//   let shortURL = generateRandomString();
-//   urlDatabase[shortURL] = {
-//     longURL: req.body.longURL,
-//     userID: users[req.session.user_id].id,
-//     visitCount: 0,
-//     uniqueVisits: 0,
-//     timeStamp: [],
-//     visitorID: []
-//   };
-
-//   visitorList[shortURL] = [];
-
-//   let generatedStr = Object.keys(urlDatabase).find(
-//     key => urlDatabase[key].longURL === req.body.longURL
-//   );
-//   res.redirect(`/urls/${generatedStr}`);
-// });
 
 app.post("/urls", async (req, res) => {
   const newShortURL = generateRandomString();
@@ -242,6 +180,8 @@ app.put("/urls/:shortURL", async (req, res) => {
       req.params.shortURL,
       req.body.longURL
     );
+    const urlID = await getURLId(req.params.shortURL);
+    await resetVisitorInfo(urlID);
     res.redirect("/urls");
   } else {
     res.send(`Error: Cannot edit someone else's URL`);

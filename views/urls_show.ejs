@@ -78,10 +78,10 @@
             </tr>
           </thead>
           <tbody>
-            <% for(let item in timeStamp) { %>
+            <% for (let visitor of visitorInfo) { %>
             <tr>
-              <td><%= visitorID[item] %></td>
-              <td><%= timeStamp[item] %></td>
+              <td><%= visitor.visitor_id %></td>
+              <td><%= visitor.timestamp %></td>
             </tr>
             <% } %>
           </tbody>
