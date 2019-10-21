@@ -19,6 +19,11 @@ body {
   padding: 1em;
 }
 
+.logo a {
+  text-decoration: none;
+  color: white;
+}
+
 .login-container {
   display: flex;
   justify-content: space-evenly;
@@ -152,6 +157,22 @@ body {
   font-size: 16px;
 }
 
+.register a:visited {
+  color: white;
+  text-decoration: none;
+}
+
+.register a {
+  color: white;
+  text-decoration: none;
+}
+
+.register a:hover {
+  color: white;
+  padding-bottom: 0.5em;
+  border-bottom: 3px solid white;
+}
+
 .contact {
   margin-top: 4em;
   font-size: 8px;
@@ -161,23 +182,42 @@ body {
   .intro-header {
     background-size: cover;
     width: 100%;
-    height: 250px;
+    height: 300px;
+  }
+  .intro-header h2 {
+    padding-top: 1em;
+    font-size: 40px;
   }
 }
 
 @media only screen and (min-width: 720px) {
+  .logo {
+    font-size: 30px;
+  }
+  .login-container p {
+    font-size: 16px;
+  }
   .features {
     margin: 5em 1em;
-  }
-
-  .intro-header {
-    /* background-size: cover; */
-    /* width: 100%;
-    height: 300px; */
   }
 }
 
 @media only screen and (min-width: 860px) {
+  .features {
+    flex-wrap: nowrap;
+    padding: 3em 2em;
+    font-size: 18px;
+  }
+  .card {
+    margin: 1em;
+  }
+  .intro-header {
+    background-size: cover;
+    height: 400px;
+  }
+}
+
+@media only screen and (min-width: 1024px) {
   .features {
     flex-wrap: nowrap;
     padding: 3em 2em;
@@ -186,7 +226,32 @@ body {
     margin: 1em;
   }
   .intro-header {
-    /* background-size: cover;
-    height: 400px; */
+    background-size: cover;
+    height: 500px;
+  }
+
+  .intro-header h2 {
+    padding-top: 2em;
+    font-size: 60px;
+  }
+
+  .promo {
+    height: 300px;
+  }
+
+  .promo-info {
+    padding-top: 5em;
+  }
+  .promo h2 {
+    font-size: 40px;
+  }
+
+  .register {
+    font-size: 20px;
+  }
+
+  .contact {
+    margin-top: 4em;
+    font-size: 12px;
   }
 }
