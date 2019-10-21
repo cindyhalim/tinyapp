@@ -1,0 +1,14 @@
+.table {
+  padding: 1em;
+  text-align: center;
+}
+
+.urls-container {
+  margin: 1.5em 2em;
+}
+
+.urls-container h3 {
+  text-align: center;
+  font-size: 30px;
+  padding: 1em 0;
+}

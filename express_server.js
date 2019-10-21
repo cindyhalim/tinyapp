@@ -41,9 +41,13 @@ app.use(methodOverride("_method"));
 
 // USER
 app.get("/login", async (req, res) => {
-  const userInfo = await getUserById(req.session.user_id);
-  let templateVars = { user: userInfo };
-  res.render("urls_login", templateVars);
+  if (!req.session.user_id) {
+    const userInfo = await getUserById(req.session.user_id);
+    let templateVars = { user: userInfo };
+    res.render("urls_login", templateVars);
+  } else {
+    res.redirect("/urls");
+  }
 });
 
 app.get("/register", async (req, res) => {

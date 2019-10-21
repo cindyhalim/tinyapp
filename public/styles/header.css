@@ -4,22 +4,36 @@ body {
   font-family: "Roboto", sans-serif;
   width: 100%;
 }
-
-.main-container {
-  background-image: url("assets/login-bg.png");
-  background-size: contain;
-  height: 800px;
-  width: 100%;
-  background-repeat: no-repeat;
+.navbar {
+  color: white;
+}
+.navbar-brand {
+  font-family: "Fredoka One", cursive;
+  color: white;
+  padding: 1em;
 }
 
-.login-card label {
-  width: 400px;
-  margin: 2em 0em;
+.navbar-brand:hover {
+  color: white;
+}
+
+/* 
+.main-container {
+  background-image: url("assets/login-bg.png");
+  background-size: cover;
+  height: auto;
+  width: 100%;
+  background-repeat: no-repeat;
+} */
+
+/* .login-card {
+  text-align: center;
+}
+
+.login-card input {
+  margin: 1em 2em;
 }
 
 .card-title {
-  text-align: center;
   padding: 0.5em;
-  color: white;
-}
+} */

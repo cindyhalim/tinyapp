@@ -1,5 +1,5 @@
 <header>
-  <nav>
+  <nav class="navbar navbar-dark bg-dark">
     <a href="/urls" class="navbar-brand">tinyApp</a>
     <button
       class="navbar-toggler"
@@ -14,44 +14,42 @@
         <i class="fas fa-sort-down"></i>
       </span>
     </button>
-    <div class="login-container">
-      <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
-        <div class="navbar-nav">
-          <a class="nav-item nav-link" href="/urls">My URLs</a>
-          <a class="nav-item nav-link" href="/urls/new">Create New URL</a>
-        </div>
+    <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+      <div class="navbar-nav">
+        <a class="nav-item nav-link" href="/urls">My URLs</a>
+        <a class="nav-item nav-link" href="/urls/new">Create New URL</a>
       </div>
-      <div class="d-flex justify-content-end align-items-center">
-        <% if (user) { %>
-        <form method="POST" action="/logout">
-          <p class="d-inline">Logged in as: <%= user.email%></p>
-          <button
-            type="submit"
-            class="btn btn-primary form-check form-check-inline"
-            style="margin-left: 0.5em"
-          >
-            Logout
-          </button>
-        </form>
-        <% } else { %>
-        <form method="GET" action="/login">
-          <button
-            type="submit"
-            class="btn btn-primary form-check form-check-inline"
-          >
-            Login
-          </button>
-        </form>
-        <form method="GET" action="/register">
-          <button
-            type="submit"
-            class="btn btn-primary form-check form-check-inline"
-          >
-            Register
-          </button>
-        </form>
-        <% } %>
-      </div>
+    </div>
+    <div class="d-flex justify-content-end align-items-center">
+      <% if (user) { %>
+      <form method="POST" action="/logout">
+        <p class="d-inline">Logged in as: <%= user.email%></p>
+        <button
+          type="submit"
+          class="btn btn-primary form-check form-check-inline"
+          style="margin-left: 0.5em"
+        >
+          Logout
+        </button>
+      </form>
+      <% } else { %>
+      <form method="GET" action="/login">
+        <button
+          type="submit"
+          class="btn btn-primary form-check form-check-inline"
+        >
+          Login
+        </button>
+      </form>
+      <form method="GET" action="/register">
+        <button
+          type="submit"
+          class="btn btn-primary form-check form-check-inline"
+        >
+          Register
+        </button>
+      </form>
+      <% } %>
     </div>
   </nav>
 </header>
