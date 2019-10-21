@@ -1,0 +1,24 @@
+* {
+  margin: 0;
+  padding: 0;
+}
+/* .card-header, .card-footer {
+  height: 10vh;
+} */
+
+.card-body {
+  padding: 5em 2em;
+  text-align: center;
+  height: 100vh;
+  background-image: linear-gradient(to left bottom, #251f94, #1f2897, #182f9a, #11369c, #0b3c9e, #0545a6, #014fad, #0058b4, #0067c2, #0076d0, #0086de, #0895eb);
+  color: white;
+}
+
+.card-title {
+  font-size: 50px;
+  padding-bottom: 0.5em;
+}
+
+.card-body form {
+  padding-bottom: 1em;
+}
