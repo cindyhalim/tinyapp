@@ -1,6 +1,6 @@
 
 <header>
-  <nav class="navbar navbar-dark bg-dark">
+  <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
     <a href="/urls" class="navbar-brand">tinyApp</a>
      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup"
       aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
@@ -11,8 +11,8 @@
         <a class="nav-item nav-link" href="/urls">My URLs</a>
         <a class="nav-item nav-link" href="/urls/new">Create New URL</a>
       </div>
-    </div>
-    <div class="d-flex justify-content-end align-items-center">
+
+      <div class="d-flex align-items-center">
       <% if (user) { %>
       <form method="POST" action="/logout">
         <p class="d-inline">Logged in as: <%= user.email%></p>
@@ -42,6 +42,7 @@
         </button>
       </form>
       <% } %>
+    </div>
     </div>
   </nav>
 </header>
