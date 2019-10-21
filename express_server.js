@@ -1,189 +1,263 @@
-const express = require('express');
+const express = require("express");
+const cookieSession = require("cookie-session");
+const bodyParser = require("body-parser");
+const bcrypt = require("bcrypt");
+const methodOverride = require("method-override");
+const {
+  getUserByEmail,
+  addNewUser,
+  getUserById,
+  getUrlById,
+  getLongUrl,
+  doesShortURLExist,
+  addNewURL,
+  deleteURL,
+  editExistingURL,
+  getURLId,
+  addVisitor,
+  totalVisits
+} = require("./server/database");
+const { generateRandomString } = require("./helpers");
+
 const app = express();
 const PORT = 8080;
 
 //MIDDLEWARE
 
-app.set('view engine', 'ejs');
+app.set("view engine", "ejs");
+app.use(
+  cookieSession({
+    name: "session",
+    keys: ["key1"]
+  })
+);
 
-const cookieSession = require('cookie-session');
-app.use(cookieSession({
-  name: 'session',
-  keys: ['key1']
-}));
-
-const bodyParser = require('body-parser');
 app.use(bodyParser.urlencoded({ extended: true }));
+app.use(express.static(__dirname + "/public"));
+app.use(methodOverride("_method"));
 
-const bcrypt = require('bcrypt');
-
-const methodOverride = require('method-override');
-app.use(methodOverride('_method'));
-
-//MODULES
-
-const { findUserId, generateRandomString, emailExists, urlsForUser } = require('./helpers.js');
-
-//DATABASE
-const urlDatabase = {};
-
-const users = {};
-
-const visitorList = {};
-
-//LOGIN/REG
-
-app.get('/login', (req, res) => {
-  let templateVars = { user: users[req.session.user_id] };
-  res.render('urls_login', templateVars);
+// USER
+app.get("/login", async (req, res) => {
+  const userInfo = await getUserById(req.session.user_id);
+  let templateVars = { user: userInfo };
+  res.render("urls_login", templateVars);
 });
 
-app.get('/register', (req, res) => {
-  let templateVars = { user: users[req.session.user_id] };
-  res.render('urls_register', templateVars);
+app.get("/register", async (req, res) => {
+  const userInfo = await getUserById(req.session.user_id);
+  let templateVars = { user: userInfo };
+  res.render("urls_register", templateVars);
 });
 
-app.post('/login', (req, res) => {
-  let email = req.body.email;
-  if (emailExists(email, users) && bcrypt.compareSync(req.body.password, users[findUserId(email, users)].password)) {
-    req.session.user_id = findUserId(email, users);
-    res.redirect('/urls');
+app.post("/login", async (req, res) => {
+  const email = req.body.email;
+  const userInfo = await getUserByEmail(email);
+  if (
+    userInfo &&
+    (req.body.password === userInfo.password ||
+      bcrypt.compareSync(req.body.password, userInfo.password))
+  ) {
+    req.session.user_id = userInfo.id;
+    res.redirect("/urls");
   } else {
     res.statusCode = 403;
-    res.send(`Error ${res.statusCode}: Email and password does not match or your email may not exist`);
+    res.send(
+      `Error ${res.statusCode}: Email and password does not match or your email may not exist`
+    );
   }
 });
 
-app.post('/register', (req, res) => {
-  if (req.body.email === '' || req.body.password === '') {
+app.post("/register", async (req, res) => {
+  const { email, password } = req.body;
+  const userInfo = await getUserByEmail(email);
+  if (email === "" || password === "") {
     res.statusCode = 400;
-    res.send(`Error ${res.statusCode}: Invalid email and/or password`);
-  } else if (emailExists(req.body.email, users)) {
+    res.send(`Error ${res.statusCode}: Enter email and/or password`);
+  } else if (userInfo.email === email) {
     res.statusCode = 400;
     res.send(`Error ${res.statusCode}: Email already exists`);
   } else {
-    let userID = generateRandomString();
-    users[userID] = { id: userID, email: req.body.email, password: bcrypt.hashSync(req.body.password, 10) };
-    req.session.user_id = users[userID].id;
-    res.redirect('/urls');
+    const hashedPassword = bcrypt.hashSync(password, 10);
+    return addNewUser(email, hashedPassword).then(data => {
+      req.session.user_id = data.rows[0].id;
+      if (data.error) {
+        return res.redirect("/register");
+      } else {
+        res.redirect("/urls");
+      }
+    });
   }
 });
 
-app.post('/logout', (req, res) => {
+app.post("/logout", (req, res) => {
   req.session = null;
-  res.redirect('/urls');
+  res.redirect("/login");
 });
 
 //GET
 
-app.get('/', (req, res) => {
-  if (users[req.session.user_id]) {
-    res.redirect('/urls');
+app.get("/", (req, res) => {
+  if (req.session.user_id) {
+    res.redirect("/urls");
   } else {
-    res.redirect('/login');
+    res.render("landing");
   }
 });
 
-app.get('/urls', (req, res) => {
-  if (users[req.session.user_id]) {
-    let templateVars = { user: users[req.session.user_id], urls: urlsForUser(req.session.user_id, urlDatabase, users) };
-    res.render('urls_index', templateVars);
+app.get("/urls", async (req, res) => {
+  if (req.session.user_id) {
+    let templateVars = {
+      user: await getUserById(req.session.user_id),
+      urls: await getUrlById(req.session.user_id)
+    };
+    res.render("urls_index", templateVars);
   } else {
-    res.redirect('/login');
+    res.redirect("/login");
   }
 });
 
-app.get('/urls/new', (req, res) => {
-  if (users[req.session.user_id]) {
-    let templateVars = { user: users[req.session.user_id] };
-    res.render('urls_new', templateVars);
+app.get("/urls/new", async (req, res) => {
+  if (req.session.user_id) {
+    let templateVars = { user: await getUserById(req.session.user_id) };
+    res.render("urls_new", templateVars);
   } else {
-    res.redirect('/login');
+    res.redirect("/login");
   }
 });
 
-app.get('/urls/:shortURL', (req, res) => {
-  if (users[req.session.user_id]) {
-    if (users[req.session.user_id].id === urlDatabase[req.params.shortURL].userID) {
-      let templateVars = {
-        user: users[req.session.user_id],
-        shortURL: req.params.shortURL,
-        longURL: urlDatabase[req.params.shortURL].longURL,
-        visitCount: urlDatabase[req.params.shortURL].visitCount,
-        uniqueCount: visitorList[req.params.shortURL].length,
-        timeStamp: urlDatabase[req.params.shortURL].timeStamp,
-        visitorID: urlDatabase[req.params.shortURL].visitorID
-      };
-      res.render('urls_show', templateVars);
+// app.get("/urls/:shortURL", (req, res) => {
+//   if (users[req.session.user_id]) {
+//     if (
+//       users[req.session.user_id].id === urlDatabase[req.params.shortURL].userID
+//     ) {
+//       let templateVars = {
+//         user: users[req.session.user_id],
+//         shortURL: req.params.shortURL,
+//         longURL: urlDatabase[req.params.shortURL].longURL,
+//         visitCount: urlDatabase[req.params.shortURL].visitCount,
+//         uniqueCount: visitorList[req.params.shortURL].length,
+//         timeStamp: urlDatabase[req.params.shortURL].timeStamp,
+//         visitorID: urlDatabase[req.params.shortURL].visitorID
+//       };
+//       res.render("urls_show", templateVars);
+//     } else {
+//       res.send("Access denied: this URL belongs to another user");
+//     }
+//   }
+// });
+
+app.get("/urls/:shortURL", async (req, res) => {
+  if (req.session.user_id) {
+    let shortURL = req.params.shortURL;
+    let userID = req.session.user_id;
+    let templateVars = {
+      user: await getUserById(userID),
+      shortURL,
+      longURL: await getLongUrl(shortURL),
+      visitCount: await totalVisits(shortURL)
+    };
+    res.render("urls_show", templateVars);
+  } else {
+    //if a unique visitor cookie then notify  res.send("Access denied: this URL belongs to another user");
+    res.redirect("/login");
+  }
+});
+
+// app.get("/u/:shortURL", (req, res) => {
+//   if (urlDatabase[req.params.shortURL]) {
+//     let longURL = urlDatabase[req.params.shortURL].longURL;
+//     //STRETCH
+
+//     urlDatabase[req.params.shortURL].visitCount++;
+//     urlDatabase[req.params.shortURL].timeStamp.push(new Date());
+//     urlDatabase[req.params.shortURL].visitorID.push(generateRandomString());
+
+//     //unique counts
+//     if (
+//       users[req.session.user_id] &&
+//       !visitorList[req.params.shortURL].includes(req.session.user_id)
+//     ) {
+//       visitorList[req.params.shortURL].push(
+//         urlDatabase[req.params.shortURL].userID
+//       );
+//     } else if (!users[req.session.user_id]) {
+//       //for cases in which visitor is not a user
+//       if (!visitorList[req.params.shortURL].includes(req.session.user_id)) {
+//         req.session.user_id = generateRandomString();
+//         visitorList[req.params.shortURL].push(req.session.user_id);
+//       }
+//     }
+//   }
+// });
+
+app.get("/u/:shortURL", async (req, res) => {
+  if (await doesShortURLExist(req.params.shortURL)) {
+    const longURL = await getLongUrl(req.params.shortURL);
+    if (req.session.user_id) {
+      urlID = await getURLid(req.params.shortURL);
+      await addVisitor(urlID, null);
     } else {
-      res.send('Access denied: this URL belongs to another user');
-    }
-  } else {
-    res.redirect('/login');
-  }
-});
-
-app.get('/u/:shortURL', (req, res) => {
-  if (urlDatabase[req.params.shortURL]) {
-    let longURL = urlDatabase[req.params.shortURL].longURL;
-    //STRETCH
-
-    urlDatabase[req.params.shortURL].visitCount++;
-    urlDatabase[req.params.shortURL].timeStamp.push(new Date());
-    urlDatabase[req.params.shortURL].visitorID.push(generateRandomString());
-
-    //unique counts
-    if (users[req.session.user_id] && !visitorList[req.params.shortURL].includes(req.session.user_id)) {
-      visitorList[req.params.shortURL].push(urlDatabase[req.params.shortURL].userID);
-    } else if (!users[req.session.user_id]) { //for cases in which visitor is not a user
-      if (! visitorList[req.params.shortURL].includes(req.session.user_id)) {
-        req.session.user_id = generateRandomString();
-        visitorList[req.params.shortURL].push(req.session.user_id);
-      }
+      req.session.visitor_id = generateRandomString();
+      urlID = await getURLId(req.params.shortURL);
+      await addVisitor(urlID, req.session.visitor_id);
     }
     res.redirect(longURL);
   } else {
-    res.send('This URL does not exist');
+    res.send("This URL does not exist");
   }
 });
 
 //POST
 
-app.post('/urls', (req, res) => {
-  let shortURL = generateRandomString();
-  urlDatabase[shortURL] = {
-    longURL: req.body.longURL,
-    userID: users[req.session.user_id].id,
-    visitCount: 0,
-    uniqueVisits: 0,
-    timeStamp: [],
-    visitorID: []
-  };
+// app.post("/urls", (req, res) => {
+//   let shortURL = generateRandomString();
+//   urlDatabase[shortURL] = {
+//     longURL: req.body.longURL,
+//     userID: users[req.session.user_id].id,
+//     visitCount: 0,
+//     uniqueVisits: 0,
+//     timeStamp: [],
+//     visitorID: []
+//   };
 
-  visitorList[shortURL] = [];
+//   visitorList[shortURL] = [];
 
-  let generatedStr = Object.keys(urlDatabase).find(key => urlDatabase[key].longURL === req.body.longURL);
-  res.redirect(`/urls/${generatedStr}`);
+//   let generatedStr = Object.keys(urlDatabase).find(
+//     key => urlDatabase[key].longURL === req.body.longURL
+//   );
+//   res.redirect(`/urls/${generatedStr}`);
+// });
+
+app.post("/urls", async (req, res) => {
+  const newShortURL = generateRandomString();
+  await addNewURL(req.session.user_id, req.body.longURL, newShortURL);
+  res.redirect(`/urls/${newShortURL}`);
 });
 
-app.delete('/urls/:shortURL', (req, res) => {
-  if (req.session.user_id === urlDatabase[req.params.shortURL].userID) {
-    delete urlDatabase[req.params.shortURL];
-    res.redirect('/urls');
-  } else {
-    res.send(`Error: Cannot remove someone else's URL`);
-  }
-});
-
-app.put('/urls/:shortURL', (req, res) => {
-  if (req.session.user_id === urlDatabase[req.params.shortURL].userID) {
-    urlDatabase[req.params.shortURL].longURL = req.body.longURL;
-    res.redirect('/urls');
+app.put("/urls/:shortURL", async (req, res) => {
+  const userInfo = await getUserById(req.session.user_id);
+  if (req.session.user_id === userInfo.id) {
+    await editExistingURL(
+      req.session.user_id,
+      req.params.shortURL,
+      req.body.longURL
+    );
+    res.redirect("/urls");
   } else {
     res.send(`Error: Cannot edit someone else's URL`);
   }
 });
 
+app.delete("/urls/:shortURL", async (req, res) => {
+  const userInfo = await getUserById(req.session.user_id);
+  if (req.session.user_id === userInfo.id) {
+    deleteURL(req.session.user_id, req.params.shortURL);
+    res.redirect("/urls");
+  } else {
+    res.send(`Error: Cannot remove someone else's URL`);
+  }
+});
+
 app.listen(PORT, () => {
-  console.log(`Example app listening on port ${PORT}`);
+  console.log(`Listening on port ${PORT}`);
 });
