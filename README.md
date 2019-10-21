@@ -8,7 +8,7 @@ TinyApp is a full stack web application that allows users to shorten long URLs (
 
 ## Final Product
 
-!["Live action preview"](https://github.com/cindyhalim/tinyapp/blob/master/docs/preview.gif?raw=true)
+!["Live action preview"](https://github.com/cindyhalim/tinyapp/blob/master/docs/live-preview.gif?raw=true)
 
 ## Final Product
 
