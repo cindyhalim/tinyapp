@@ -18,9 +18,9 @@
       href="https://fonts.googleapis.com/css?family=Roboto:300,400,500&display=swap"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="../styles/header.css" />
-    <link rel="stylesheet" href="./styles/index.css" />
-    <title>TinyApp</title>
+    <link rel="stylesheet" type="text/css" href="../styles/header.css" />
+    <link rel="stylesheet" type="text/css" href="/styles/index.css" />
+    <title>tinyApp</title>
   </head>
 
   <body>
@@ -46,7 +46,7 @@
             </td>
             <td><%= url.long_url %></td>
             <td>
-              <form method="GET" action="/urls/<%= url.short_url %>">
+              <form method="GET" action="/urls/<%=url.short_url%>">
                 <button type="submit" class="btn btn-outline-info">
                   Edit
                 </button>

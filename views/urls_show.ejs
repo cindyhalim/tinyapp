@@ -4,37 +4,32 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>URL - tinyApp</title>
     <link
       rel="stylesheet"
       href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css"
       integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS"
       crossorigin="anonymous"
     />
-    <link rel="stylesheet" href="../styles/header.css" />
-    <title>URL - TinyApp Example</title>
-  </head>
-
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
     <link
+      href="https://fonts.googleapis.com/css?family=Fredoka+One&display=swap"
       rel="stylesheet"
-      href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css"
-      integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS"
-      crossorigin="anonymous"
     />
-    <title>URL - TinyApp Example</title>
+    <link
+      href="https://fonts.googleapis.com/css?family=Roboto:300,400,500&display=swap"
+      rel="stylesheet"
+    />
+        <link rel="stylesheet" type = "text/css" href="/styles/show.css" />
+    <link rel="stylesheet" type = "text/css" href="../styles/header.css" />
   </head>
 
   <body>
     <% include ./partials/_header %>
     <div class="card text-center">
-      <div class="card-header"></div>
       <div class="card-body">
-        <h5 class="card-title">TinyURL for: <%= longURL %></h5>
+        <h5 class="card-title"><%= longURL %></h5>
         <p class="card-text">
-          Short URL: <a href="/u/<%= shortURL %>"><%= shortURL %></a>
+         tinyURL: <a href="/u/<%= shortURL%>" target="_blank"><%= shortURL %></a>
         </p>
       </div>
       <div class="card-footer text-muted">
@@ -57,20 +52,12 @@
             </button></label
           >
         </form>
-        <p style="font-weight: bold; font-size: 12px">
-          Total visits: <%= visitCount %>
-        </p>
-        <p style="font-weight: bold; font-size: 12px">
-          Unique visits: <%= uniqueCount %>
-        </p>
-        <button
-          class="btn btn-primary form-check"
-          style="margin-bottom: 2em"
-          id="toggleButton"
-        >
-          Click to view visitor information
-        </button>
-        <table class="table table-hover" id="toggleTable">
+        <hr>
+        <h2 class="card-title">Analytics</h2>
+        <div class="analytics-container">
+        <p>Total visits: <%= visitCount %></p>
+        <p>Unique visits: <%= uniqueCount %></p>
+        <table class="table table-hover visitor-table">
           <thead>
             <tr>
               <th scope="col">Visitor ID</th>
@@ -86,6 +73,7 @@
             <% } %>
           </tbody>
         </table>
+      </div>
       </div>
     </div>
     <script

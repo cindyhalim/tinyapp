@@ -1,0 +1,19 @@
+body {
+  margin: 0;
+  padding: 0;
+  font-family: 'Robotto', sans-serif;
+}
+.new-url-container {
+  text-align: center;
+  width: auto;
+  height: 100vh;
+  background-image: linear-gradient(to left bottom, #251f94, #1f2897, #182f9a, #11369c, #0b3c9e, #0545a6, #014fad, #0058b4, #0067c2, #0076d0, #0086de, #0895eb);
+  color: white;
+  padding: 20vh 1em;
+}
+
+.new-url-container h3 {
+  font-size: 40px;
+  padding-bottom: 2em;
+}
+

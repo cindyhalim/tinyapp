@@ -1,0 +1,55 @@
+
+.card.text-center {
+  font-family: "Roboto", sans-serif;
+  background-image: linear-gradient(to left bottom, #251f94, #1f2897, #182f9a, #11369c, #0b3c9e, #0545a6, #014fad, #0058b4, #0067c2, #0076d0, #0086de, #0895eb);
+  height: 100vh;
+  outline: none;
+}
+
+.card-body {
+  margin: 6em 0;
+  color: white;
+
+}
+.card-body h5{
+  font-size: 40px;
+}
+
+.card-body a{
+  color: white;
+}
+
+.card-body a:hover {
+  color: white;
+}
+.card-body p {
+  margin-top: 1em;
+  font-size: 20px;
+}
+
+.analytics-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  padding: 1em;
+}
+
+.card-footer {
+  background-color:#f0f0f0;
+  height: 100vh;
+}
+
+.card-footer h2 {
+  padding-top: 1em;
+}
+
+.card-footer p {
+  font-weight: bold;
+}
+
+.table.visitor-table {
+  width: 60%;
+  padding: 3em;
+  text-align: center;
+}
